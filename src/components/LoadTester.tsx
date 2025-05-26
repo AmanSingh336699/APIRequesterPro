@@ -1,7 +1,6 @@
 "use client";
 import { useState, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { useEnvStore } from "@/stores/envStore";
@@ -17,6 +16,8 @@ import {
     Legend,
 } from "chart.js";
 import Input from "./ui/Input";
+import { makeRequest } from "@/lib/axios";
+import { validateUrl } from "@/utils/helper";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -96,8 +97,11 @@ export default function LoadTester({ request, collection }: LoadTesterProps) {
             } else if (collection) {
                 payload.collectionId = collection._id;
             }
-
-            const res = await axios.post("/api/loadtest", payload, { withCredentials: true });
+            const res = await makeRequest({
+                method: "POST",
+                url: "/loadtest",
+                data: payload
+            })
             return res.data;
         },
         onSuccess: (data) => {
@@ -172,7 +176,7 @@ export default function LoadTester({ request, collection }: LoadTesterProps) {
                     borderColor: "rgba(59, 130, 246, 1)",
                     backgroundColor: "rgba(59, 130, 246, 0.2)",
                     fill: false,
-                    tension: 0.3, // Add some curve to the line
+                    tension: 0.3,
                 },
                 {
                     label: "Error Rate (%)",
@@ -180,7 +184,7 @@ export default function LoadTester({ request, collection }: LoadTesterProps) {
                     borderColor: "rgba(239, 68, 68, 1)",
                     backgroundColor: "rgba(239, 68, 68, 0.2)",
                     fill: false,
-                    tension: 0.3, // Add some curve to the line
+                    tension: 0.3,
                 },
             ],
         };
@@ -235,7 +239,7 @@ export default function LoadTester({ request, collection }: LoadTesterProps) {
                             concurrency < 1 ||
                             iterations < 1
                         }
-                        className="w-full lg:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200 flex items-center justify-center"
+                        className="w-full lg:w-auto bg-blue-600 disabled:cursor-not-allowed hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200 flex items-center justify-center"
                         aria-label="Run load test"
                     >
                         {runLoadTestMutation.isPending ? (
@@ -437,10 +441,10 @@ export default function LoadTester({ request, collection }: LoadTesterProps) {
                                                             </td>
                                                             <td className="px-3 py-3 whitespace-nowrap text-gray-800 dark:text-gray-300 text-sm">
                                                                 <span className={`font-semibold ${metric.method === 'GET' ? 'text-blue-500' :
-                                                                        metric.method === 'POST' ? 'text-green-500' :
-                                                                            metric.method === 'PUT' ? 'text-yellow-500' :
-                                                                                metric.method === 'DELETE' ? 'text-red-500' :
-                                                                                    'text-gray-500'
+                                                                    metric.method === 'POST' ? 'text-green-500' :
+                                                                        metric.method === 'PUT' ? 'text-yellow-500' :
+                                                                            metric.method === 'DELETE' ? 'text-red-500' :
+                                                                                'text-gray-500'
                                                                     }`}>
                                                                     {metric.method}
                                                                 </span>

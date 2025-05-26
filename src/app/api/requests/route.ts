@@ -18,8 +18,9 @@ async function handler(req: NextRequest) {
       const body = await req.json();
       const sanitizedBody = sanitizeObject(body);
       const data = saveRequestSchema.parse(sanitizedBody);
+      console.log("requestdata-collection", data)
       const request = new Request({ ...data, userId: session.user.id });
-      const collection = Collection.findByIdAndUpdate(body.collectionId, { $addToSet: { requests: request._id } }, { new: true })
+      const collection = Collection.findByIdAndUpdate(data.collectionId, { $addToSet: { requests: request._id } }, { new: true })
       if(!collection){
         return NextResponse.json({ error: "Collection not found" }, { status: 404 })
       }

@@ -5,18 +5,9 @@ import { makeRequest } from "@/lib/axios";
 import { useRequestStore } from "@/stores/requestStore";
 import { useEnvStore } from "@/stores/envStore";
 import { motion, AnimatePresence } from "framer-motion";
-import Button from "@/components/ui/Button"; // Assuming this is your custom Button component
+import Button from "@/components/ui/Button";
 import { useEffect, useState } from "react";
-import {
-  ChevronDown,
-  ChevronUp,
-  X,
-  Plus,
-  Loader2, 
-  TriangleAlert, 
-  FolderDot, 
-  PlusCircle, 
-} from "lucide-react";
+import { ChevronDown, ChevronUp, X,Plus,Loader2, TriangleAlert, FolderDot, PlusCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface SidebarProps {
@@ -145,7 +136,6 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       shadow-xl md:shadow-none custom-scrollbar border-r border-gray-200 dark:border-gray-700" 
     >
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">PostXpert</h2>
         <Button
           onClick={toggleSidebar}
           className="md:hidden p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"

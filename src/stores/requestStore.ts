@@ -6,8 +6,6 @@ export interface ApiRequest {
   url: string;
   headers: { key: string; value: string }[];
   body?: string;
-  preScript?: string;
-  testScript?: string;
 }
 
 interface RequestState {
@@ -22,8 +20,6 @@ export const useRequestStore = create<RequestState>((set) => ({
     url: "",
     headers: [],
     body: "",
-    preScript: "",
-    testScript: "",
   },
   setRequest: (request) =>
     set(
@@ -39,8 +35,6 @@ export const useRequestStore = create<RequestState>((set) => ({
           url: "",
           headers: [],
           body: "",
-          preScript: "",
-          testScript: "",
         };
       })
     ),
