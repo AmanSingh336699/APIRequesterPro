@@ -57,7 +57,7 @@ async function handler(req: NextRequest) {
                 userId: session.user.id,
             });
             return NextResponse.json({ scanId: scanResult._id }, { status: 201 });
-        } catch (error: any) {
+        } catch{
             return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
         }
     }

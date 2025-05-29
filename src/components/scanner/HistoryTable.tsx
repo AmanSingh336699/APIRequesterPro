@@ -243,7 +243,7 @@ export default function HistoryTable() {
                         <path d="M50 30V70M30 50H70" stroke="#6B7280" strokeWidth="6" strokeLinecap="round" />
                     </svg>
                     <p className="text-xl font-semibold mb-3">No Scan History Found</p>
-                    <p className="max-w-md mb-6">It looks like you haven't performed any API scans yet. Start a new scan to see your results here!</p>
+                    <p className="max-w-md mb-6">It looks like you haven&apos;t performed any API scans yet. Start a new scan to see your results here!</p>
                     <Link href="/scan">
                         <motion.button
                             className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg transition-all duration-300 ease-in-out flex items-center gap-2"

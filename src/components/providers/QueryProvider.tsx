@@ -8,7 +8,7 @@ type Props = {
   dehydratedState?: unknown;
 };
 
-export default function QueryProvider({ children, dehydratedState }: Props) {
+export default function QueryProvider({ children }: Props) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (

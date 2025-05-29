@@ -65,13 +65,12 @@ export async function GET(req: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (error) {
-    console.error('Fetch history error:', error);
+  } catch{
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE() {
   try {
     await connectToDatabase();
     const session = await getServerSession(authOptions);
@@ -82,7 +81,7 @@ export async function DELETE(req: NextRequest) {
 
     await ScanResult.deleteMany({ userId })
     return NextResponse.json({ message: 'All scan history deleted' }, { status: 200 });
-  } catch (error) {
+  } catch{
     return NextResponse.json({ message: 'Failed to delete history' }, { status: 500 });
   }
 }

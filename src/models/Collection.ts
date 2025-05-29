@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Request from "./Request"
 
 const collectionSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },

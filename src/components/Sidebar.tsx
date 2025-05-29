@@ -84,7 +84,6 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       const request = res.data.find((r: any) => r._id === requestId);
       if (request) {
         setRequest(request);
-        console.log("request", request)
         toast.success(`Loaded request: ${request.name}`);
         if (!isMdUp) toggleSidebar();
       } else {
@@ -128,7 +127,9 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
         <FolderDot className="h-12 w-12 mb-4 text-blue-500" />
         <p className="text-xl font-semibold mb-2">No Collections Found</p>
         <p className="text-sm text-center max-w-xs">
-          It looks like you haven't created any collections yet. Let's get started!
+          <p className="text-sm text-center max-w-xs">
+            It looks like you haven&apos;t created any collections yet. Let&apos;s get started!
+          </p>
         </p>
         <Button
           className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300 flex items-center group"
