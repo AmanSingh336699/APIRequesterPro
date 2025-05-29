@@ -71,7 +71,6 @@ async function handler(req: NextRequest) {
       const body = await req.json();
       const sanitizedBody = sanitizeObject(body);
       const data = requestHistorySchema.parse(sanitizedBody);
-      console.log("request history data", data)
       const requestHistory = new History({
         userId: session.user.id,
         ...data,

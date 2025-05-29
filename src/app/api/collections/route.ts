@@ -20,7 +20,7 @@ async function handler(req: NextRequest) {
   if (req.method === "GET") {
     await connectToDatabase()
     try {
-      const collections = await Collection.find({ userId: session?.user.id }).lean()
+      const collections = await Collection.find({ userId: session?.user.id }).populate("requests", "name method").exec()
       console.log("col", collections)
       return NextResponse.json(collections);
     } catch (error: any) {

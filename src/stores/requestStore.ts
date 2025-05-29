@@ -4,7 +4,7 @@ import { produce } from "immer";
 export interface ApiRequest {
   method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   url: string;
-  headers: { key: string; value: string }[];
+  headers?: { key: string; value: string }[];
   body?: string;
 }
 

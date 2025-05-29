@@ -12,8 +12,6 @@ export interface ApiRequest {
   url: string;
   headers?: { key: string; value: string }[];
   body?: string;
-  preScript?: string;
-  testScript?: string;
 }
 
 export interface Collection {

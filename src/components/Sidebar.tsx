@@ -7,7 +7,15 @@ import { useEnvStore } from "@/stores/envStore";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
 import { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, X,Plus,Loader2, TriangleAlert, FolderDot, PlusCircle } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  X,
+  Plus,
+  Loader2,
+  TriangleAlert,
+  FolderDot
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 interface SidebarProps {
@@ -22,10 +30,16 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const [openCollection, setOpenCollection] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkMd = () => setIsMdUp(window.innerWidth >= 768);
-    checkMd();
-    window.addEventListener("resize", checkMd);
-    return () => window.removeEventListener("resize", checkMd);
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => setIsMdUp(window.innerWidth >= 768), 100);
+    };
+
+    let timeoutId: NodeJS.Timeout;
+    window.addEventListener("resize", handleResize);
+    handleResize();
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const { data: fetchedEnvironments, isLoading: envLoading, isError: envError, error: envErrorObj } = useQuery({
@@ -68,10 +82,9 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       const request = res.data.find((r: any) => r._id === requestId);
       if (request) {
         setRequest(request);
+        console.log("request", request)
         toast.success(`Loaded request: ${request.name}`);
-        if (!isMdUp) {
-          toggleSidebar();
-        }
+        if (!isMdUp) toggleSidebar();
       } else {
         toast.error("Request not found in collection.");
       }
@@ -133,7 +146,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       animate={{ x: isMdUp || isOpen ? 0 : -300 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="fixed md:static top-0 left-0 w-72 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 p-5 h-screen overflow-y-auto z-50 md:z-0
-      shadow-xl md:shadow-none custom-scrollbar border-r border-gray-200 dark:border-gray-700" 
+      shadow-xl md:shadow-none custom-scrollbar border-r border-gray-200 dark:border-gray-700"
     >
       <div className="flex justify-between items-center mb-8">
         <Button
@@ -157,7 +170,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
             value={selectedEnvironment ?? ""}
             onChange={(e) => setSelectedEnvironment(e.target.value || null)}
             className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg
-              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-base appearance-none bg-no-repeat bg-right-1rem pr-10" // Added appearance-none for custom arrow
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-base appearance-none bg-no-repeat bg-right-1rem pr-10"
             style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundSize: '1.2em', backgroundPosition: 'calc(100% - 12px) center', backgroundRepeat: 'no-repeat' }}
           >
             <option value="">No Environment Selected</option>
@@ -176,7 +189,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
             <Button
               className="w-full flex justify-between items-center p-4 text-left font-bold text-lg text-gray-900 dark:text-white
                 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors duration-200 rounded-t-xl
-                group-hover:text-blue-600 dark:group-hover:text-blue-300" 
+                group-hover:text-blue-600 dark:group-hover:text-blue-300"
               onClick={() => toggleCollection(col._id)}
             >
               <div className="flex items-center">
@@ -220,16 +233,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                       ))}
                     </div>
                   ) : (
-                    <div className="py-2 text-center text-gray-500 dark:text-gray-400 text-sm italic">
-                      No requests in this collection.
-                      <Button
-                        variant="ghost"
-                        className="mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 text-sm flex items-center mx-auto"
-                        onClick={() => toast("Implement 'Add Request' modal/form")}
-                      >
-                        <PlusCircle size={16} className="mr-1" /> Add New Request
-                      </Button>
-                    </div>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm italic">No requests in this collection.</p>
                   )}
                 </motion.div>
               )}
