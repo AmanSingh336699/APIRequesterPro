@@ -52,8 +52,11 @@ async function postHandler(req: NextRequest, context: RouteContext) {
 
     return NextResponse.json(newRequest, { status: 201 });
   } catch (error: any) {
-    console.error("Error creating request:", error);
-    return NextResponse.json({ error: "Failed to create request" }, { status: 500 });
+    let message = "Failed to create request"
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

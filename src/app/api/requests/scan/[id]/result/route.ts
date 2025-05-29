@@ -10,7 +10,7 @@ interface RouteContext {
   };
 }
 
-export async function GET(req: NextRequest, context: RouteContext) {
+export async function GET(context: RouteContext) {
   try {
     await connectToDatabase();
     const session = await getServerSession(authOptions);

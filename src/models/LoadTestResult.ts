@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const loadTestResultSchema = new Schema({
     userId: { type: String, required: true, index: true },

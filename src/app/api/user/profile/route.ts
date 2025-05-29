@@ -11,7 +11,7 @@ const updateProfileSchema = z.object({
     password: z.string().min(6, "Password must be atleast 6 characters").optional()
 })
 
-export async function GET(req: NextRequest, res: NextResponse){
+export async function GET(){
     const session = await getServerSession(authOptions)
     if(!session){
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -24,12 +24,12 @@ export async function GET(req: NextRequest, res: NextResponse){
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
         return NextResponse.json(user)
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 })
     }
 }
 
-export async function PUT(req: NextRequest, res: NextResponse){
+export async function PUT(req: NextRequest){
     const session = await getServerSession(authOptions)
     if(!session){
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

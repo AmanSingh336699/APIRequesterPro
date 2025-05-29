@@ -93,7 +93,7 @@ export default function HistoryTable() {
                 toast.success('Scan deleted successfully', { id: toastId });
                 queryClient.invalidateQueries({ queryKey: ['scanHistory', page, session?.user?.id] });
             }
-        } catch (err) {
+        } catch{
             toast.error('Failed to delete scan. Please try again.', { id: toastId });
             queryClient.setQueryData(['scanHistory', page, session?.user?.id, searchTerm, sort.field, sort.direction], {
                 scans: previousScans,
@@ -113,7 +113,7 @@ export default function HistoryTable() {
                 toast.success('All scans deleted successfully', { id: toastId });
                 queryClient.invalidateQueries({ queryKey: ['scanHistory', page, session?.user?.id] });
             }
-        } catch (err) {
+        } catch{
             toast.error('Failed to delete all scans. Please try again.', { id: toastId });
         }
     };

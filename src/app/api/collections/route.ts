@@ -5,7 +5,6 @@ import { sanitizeObject } from "@/lib/sanitize";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { connectToDatabase } from "@/lib/db";
-import Request from "@/models/Request";
 
 const createCollectionSchema = z.object({
   name: z.string().min(1, "Collection name is required").trim(),

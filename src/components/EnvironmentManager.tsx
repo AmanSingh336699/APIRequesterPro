@@ -9,18 +9,7 @@ import toast from "react-hot-toast";
 import EnvironmentList from "./Environment/EnvironmentList";
 import { motion, AnimatePresence } from "framer-motion";
 import EditEnvironmentModal from "./Environment/EditEnvironmentModal";
-
-const variableSchema = z.object({
-    key: z.string().min(1, "Key is required").trim(),
-    value: z.string().trim(),
-});
-
-const environmentSchema = z.object({
-    name: z.string().min(1, "Environment name is required").trim(),
-    variables: z.array(variableSchema).optional(),
-});
-
-type EnvironmentFormData = z.infer<typeof environmentSchema>;
+import { EnvironmentFormData } from "@/validators/env.schema";
 
 interface Variable {
     key: string;

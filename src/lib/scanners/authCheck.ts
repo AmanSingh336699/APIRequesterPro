@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export async function authCheck(url: string, headers: Record<string, string>, body: Record<string, any>) {
     try {
-        const response = await axios.get(url, { headers, timeout: 5000 });
+        const response = body ? await axios.post(url, body, { headers, timeout: 10000 }) : await axios.get(url, { headers, timeout: 10000 })
 
         if (response.status === 401 || response.status === 403) {
             return {

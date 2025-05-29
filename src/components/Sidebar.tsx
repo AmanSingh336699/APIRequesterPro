@@ -30,31 +30,33 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const [openCollection, setOpenCollection] = useState<string | null>(null);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
     const handleResize = () => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => setIsMdUp(window.innerWidth >= 768), 100);
+      timeoutId = setTimeout(() => {
+        setIsMdUp(window.innerWidth >= 768);
+      }, 100);
     };
 
-    let timeoutId: NodeJS.Timeout;
     window.addEventListener("resize", handleResize);
     handleResize();
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
+
 
   const { data: fetchedEnvironments, isLoading: envLoading, isError: envError, error: envErrorObj } = useQuery({
     queryKey: ["environments"],
     queryFn: async () => {
-      try {
-        const res = await makeRequest({ method: "GET", url: "/environments" });
-        return res.data;
-      } catch (error: any) {
-        toast.error(`Failed to load environments: ${error.message || 'Unknown error'}`);
-        throw error;
-      }
+      const res = await makeRequest({ method: "GET", url: "/environments" });
+      return res.data;
     },
     staleTime: 5 * 60 * 1000,
   });
+
 
   useEffect(() => {
     if (fetchedEnvironments) {

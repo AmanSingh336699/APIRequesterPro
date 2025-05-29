@@ -1,11 +1,15 @@
 import axios from 'axios';
 
-export async function headerCheck(url: string, headers: Record<string, string>, body: Record<string, any>) {
+export async function headerCheck(
+  url: string,
+  headers: Record<string, string> = {}
+) {
   try {
-    const response = await axios.get(url, { headers, timeout: 5000 });
+    const response = await axios.get(url, { headers, timeout: 10000 });
     const responseHeaders = response.headers;
 
-    const missingHeaders = [];
+    const missingHeaders: string[] = [];
+
     if (!responseHeaders['strict-transport-security']) {
       missingHeaders.push('Strict-Transport-Security');
     }
@@ -32,19 +36,18 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      // Add other directives as needed
     },
   },
 }));
 
 For other frameworks:
 
-- **Django:** https://django-extensions.readthedocs.io/en/latest/security.html#security-middleware
-- **Flask:** https://flask-talisman.readthedocs.io/en/latest/
-- **ASP.NET Core:** https://learn.microsoft.com/en-us/aspnet/core/security/headers/
-- **Spring Boot:** https://www.baeldung.com/spring-security-headers
+- Django: https://django-extensions.readthedocs.io/en/latest/security.html#security-middleware
+- Flask: https://flask-talisman.readthedocs.io/en/latest/
+- ASP.NET Core: https://learn.microsoft.com/en-us/aspnet/core/security/headers/
+- Spring Boot: https://www.baeldung.com/spring-security-headers
 
-Always test your security headers using tools like [securityheaders.com](https://securityheaders.com) to verify correct implementation.`,
+Always test your security headers using tools like https://securityheaders.com to verify correct implementation.`,
         fixLanguage: 'plaintext',
       };
     }

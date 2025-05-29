@@ -27,7 +27,7 @@ async function handler(req: NextRequest, context: RouterContext) {
                 return NextResponse.json({ message: 'Scan not found' }, { status: 404 });
             }
             return NextResponse.json({ message: 'Scan deleted successfully' }, { status: 200 });
-        } catch (error) {
+        } catch{
             return NextResponse.json({ message: 'Failed to delete scan' }, { status: 500 });
         }
     }

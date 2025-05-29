@@ -23,15 +23,18 @@ export async function POST(req: Request) {
     });
     await connectToDatabase();
     const existingUser = await User.findOne({ email }).lean();
-    if (existingUser){
-      console.log("already user")
+    if (existingUser) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 })
     }
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = new User({ name, email, password: hashedPassword });
     await user.save();
     return NextResponse.json({ message: "User created" }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Registration failed" }, { status: 400 });
+  } catch (error) {
+    let message = "Registration failed";
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

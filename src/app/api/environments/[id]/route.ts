@@ -3,7 +3,7 @@ import Environment from "@/models/Environment";
 import { securityMiddleware } from "@/lib/securityMiddleware";
 import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware";
 import { dbMiddleware } from "@/lib/dbMiddleware";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 import { sanitizeObject } from "@/lib/sanitize";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -19,40 +19,46 @@ const updateEnvironmentSchema = z.object({
 });
 
 interface RouteContext {
-  params: {
-    id: string;
-  };
+    params: {
+        id: string;
+    };
 }
 
 async function handler(req: NextRequest, context: RouteContext) {
     const session = await getServerSession(authOptions);
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const resolvedParams = await context.params;
-    const envId = resolvedParams.id;
+    const envId = context.params.id;
+
     if (req.method === "PUT") {
         try {
             const body = await req.json();
             const sanitizedBody = sanitizeObject(body);
             const { name, variables } = updateEnvironmentSchema.parse(sanitizedBody);
+
             const environment = await Environment.findOneAndUpdate(
                 { _id: envId, userId: session.user.id },
                 { name, variables: variables || [] },
                 { new: true }
             );
+
             if (!environment) {
                 return NextResponse.json({ error: "Environment not found" }, { status: 404 });
             }
+
             return NextResponse.json(environment);
-        } catch (error: any) {
-            console.error("Error updating environment:", error);
-            if (error instanceof z.ZodError) {
-                return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
+        } catch (err) {
+            if (err instanceof ZodError) {
+                return NextResponse.json({ error: err.errors[0]?.message || "Validation error" }, { status: 400 });
             }
-            return NextResponse.json(
-                { error: error.message || "Failed to update environment" },
-                { status: 400 }
-            );
+
+            if (err instanceof Error) {
+                return NextResponse.json({ error: err.message }, { status: 400 });
+            }
+
+            return NextResponse.json({ error: "Failed to update environment" }, { status: 400 });
         }
     }
 
@@ -62,12 +68,17 @@ async function handler(req: NextRequest, context: RouteContext) {
                 _id: envId,
                 userId: session.user.id,
             });
+
             if (!environment) {
                 return NextResponse.json({ error: "Environment not found" }, { status: 404 });
             }
+
             return NextResponse.json({ message: "Environment deleted successfully" });
-        } catch (error: any) {
-            console.error("Error deleting environment:", error);
+        } catch (err) {
+            if (err instanceof Error) {
+                return NextResponse.json({ error: err.message }, { status: 500 });
+            }
+
             return NextResponse.json({ error: "Failed to delete environment" }, { status: 500 });
         }
     }

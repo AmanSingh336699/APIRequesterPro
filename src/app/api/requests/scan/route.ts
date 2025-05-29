@@ -12,7 +12,7 @@ import { securityMiddleware } from '@/lib/securityMiddleware';
 import { rateLimitMiddleware } from '@/lib/rateLimitMiddleware';
 import { dbMiddleware } from '@/lib/dbMiddleware';
 
-async function handler(req: NextRequest, context: any) {
+async function handler(req: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,7 +23,6 @@ async function handler(req: NextRequest, context: any) {
             const body = await req.json()
             const parsed = scanInputSchema.safeParse(body);
             if (!parsed.success) {
-                console.log("parsedd", parsed)
                 return NextResponse.json({ error: parsed.error.errors }, { status: 400 });
             }
             const { url, headers, body: requestBody } = parsed.data;
@@ -34,7 +33,6 @@ async function handler(req: NextRequest, context: any) {
                 for (let attempt = 1; attempt <= 3; attempt++) {
                     try {
                         const data = await scanner(url, headersObj, bodyObj);
-                        console.log("scanner", data)
                         return data
                     } catch (error: any) {
                         if (attempt === 3) {
@@ -52,17 +50,14 @@ async function handler(req: NextRequest, context: any) {
                 }
             });
             const results = await Promise.all(scanPromises);
-            console.log("scan results", results)
             const scanResult = await ScanResult.create({
                 url,
                 results,
                 timestamp: new Date(),
                 userId: session.user.id,
             });
-            console.log("scanResult", scanResult)
             return NextResponse.json({ scanId: scanResult._id }, { status: 201 });
         } catch (error: any) {
-            console.error('Scan error:', error);
             return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
         }
     }

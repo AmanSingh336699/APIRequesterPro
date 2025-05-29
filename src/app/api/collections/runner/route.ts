@@ -7,11 +7,12 @@ import Environment from "@/models/Environment";
 import { makeRequest } from "@/lib/axios";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { AxiosError } from "axios";
 
 async function handler(req: NextRequest) {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (req.method !== "POST") {
@@ -55,9 +56,13 @@ async function handler(req: NextRequest) {
         try {
             new URL(parsedRequest.url);
             if (parsedRequest.body) JSON.parse(parsedRequest.body);
-        } catch (error: any) {
+        } catch (parseValidationError) {
+            let errorMessage = "Invalid request data";
+            if (parseValidationError instanceof Error) {
+                errorMessage = `Invalid request data: ${parseValidationError.message}`;
+            }
             return NextResponse.json(
-                { error: `Invalid request data: ${error.message}` },
+                { error: errorMessage },
                 { status: 400 }
             );
         }
@@ -67,7 +72,7 @@ async function handler(req: NextRequest) {
             const res = await makeRequest({
                 method: parsedRequest.method,
                 url: parsedRequest.url,
-                headers: parsedRequest.headers?.reduce((acc: any, h: any) => ({ ...acc, [h.key]: h.value }), {}) || {},
+                headers: parsedRequest.headers?.reduce((acc: Record<string, string>, h: { key: string; value: string }) => ({ ...acc, [h.key]: h.value }), {}) || {},
                 data: parsedRequest.body ? JSON.parse(parsedRequest.body) : undefined,
             });
 
@@ -80,17 +85,44 @@ async function handler(req: NextRequest) {
                 ),
                 time: Date.now() - startTime,
             });
-        } catch (error: any) {
+        } catch (requestError) {
+            let errorMessage = "Request failed";
+            let errorStatus = 0;
+
+            if (requestError instanceof AxiosError) {
+                if (requestError.response) {
+                    errorMessage = requestError.response.data?.message || requestError.message;
+                    errorStatus = requestError.response.status;
+                } else if (requestError.request) {
+                    errorMessage = "No response received from target server";
+                    errorStatus = 503;
+                } else {
+                    errorMessage = requestError.message;
+                    errorStatus = 500;
+                }
+            } else if (requestError instanceof Error) {
+                errorMessage = requestError.message;
+                errorStatus = 500;
+            } else {
+                errorMessage = String(requestError);
+                errorStatus = 500;
+            }
+
             return NextResponse.json({
                 success: false,
-                error: error.message,
-                status: error.response?.status || 0,
+                error: errorMessage,
+                status: errorStatus,
                 time: Date.now() - startTime,
             });
         }
-    } catch (error: any) {
-        console.error("Run request error:", error);
-        return NextResponse.json({ error: "Failed to run request: " + error.message }, { status: 500 });
+    } catch (initialError) {
+        let errorMessage = "Failed to run request";
+        if (initialError instanceof Error) {
+            errorMessage = `Failed to run request: ${initialError.message}`;
+        } else {
+            errorMessage = `Failed to run request: ${String(initialError)}`;
+        }
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
 

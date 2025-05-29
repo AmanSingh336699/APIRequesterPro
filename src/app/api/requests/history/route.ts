@@ -49,7 +49,6 @@ async function handler(req: NextRequest) {
         ]),
         History.countDocuments({ userId: new mongoose.Types.ObjectId(session.user.id) }),
       ]);
-      console.log("results history", results)
       return NextResponse.json({
         data: results,
         pagination: {
@@ -59,8 +58,7 @@ async function handler(req: NextRequest) {
           totalPages: Math.ceil(totalCount / limit),
         },
       });
-    } catch (error: any) {
-      console.error("Error fetching request history:", error);
+    } catch{
       return NextResponse.json({ error: "Failed to fetch request history" }, { status: 500 });
     }
   }
@@ -93,7 +91,7 @@ async function handler(req: NextRequest) {
         return NextResponse.json({ error: "History item not found" }, { status: 404 })
       }
       return NextResponse.json({ message: "History item deleted successfully" })
-    } catch (error) {
+    } catch{
       return NextResponse.json({ error: "Failed to delete history item" }, { status: 500 })
     }
   }

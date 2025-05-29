@@ -5,8 +5,8 @@ import { Loader2, Save, XCircle, Info } from "lucide-react";
 interface SaveRequestModalProps {
   isSaveModalOpen: boolean;
   setIsSaveModalOpen: (open: boolean) => void;
-  saveForm: any; 
-  onSaveSubmit: (data: any) => void; 
+  saveForm: any;
+  onSaveSubmit: (data: any) => void;
   collections: Array<{ _id: string; name: string }>;
   collectionsLoading: boolean;
   saveMutation: { isPending: boolean };
@@ -36,7 +36,7 @@ export default function SaveRequestModal({
             ) : collections.length === 0 ? (
               <p className="text-red-600 dark:text-red-400 text-sm sm:text-base text-center p-3 sm:p-4 border border-red-300 dark:border-red-700 rounded-lg sm:rounded-xl bg-red-50 dark:bg-red-900 flex items-center justify-center gap-1 sm:gap-2">
                 <Info className="h-4 sm:h-5 w-4 sm:w-5" />
-                No collections found. Please create a collection in the "Collections" tab first.
+                No collections found. Please create a collection in the &quot;Collections&quot; tab first.
               </p>
             ) : (
               <div className="relative">

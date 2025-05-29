@@ -10,7 +10,7 @@ export function rateLimitMiddleware<T>(handler: (req: NextRequest, context: T) =
     try {
       await rateLimiter.consume(ip);
       return await handler(req, context);
-    } catch (error) {
+    } catch{
       return NextResponse.json({ error: "Rate limit exceeded. Please try again later." }, { status: 429 });
     }
   };

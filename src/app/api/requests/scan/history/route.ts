@@ -11,8 +11,6 @@ const getQuerySchema = z.object({
   search: z.string().optional(),
   sortBy: z.enum(['url', 'timestamp', 'status']).default('timestamp'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
-  // startDate: z.string().optional(),
-  // endDate: z.string().optional(),
 });
 
 export async function GET(req: NextRequest) {

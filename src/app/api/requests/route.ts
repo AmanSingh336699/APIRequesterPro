@@ -18,15 +18,13 @@ async function handler(req: NextRequest) {
       let body
       try {
         body = await req.json()
-      } catch (error) {
+      } catch{
         return NextResponse.json({ error: "Invalid or empty JSON body" }, { status: 400 })
       }
       const sanitizedBody = sanitizeObject(body);
       const data = saveRequestSchema.parse(sanitizedBody);
       const request = new Request({ ...data, userId: session.user.id });
-      console.log("request made", request)
       const collection = await Collection.findByIdAndUpdate(data.collectionId, { $addToSet: { requests: request._id } }, { new: true })
-      console.log("collection made", collection)
       if(!collection){
         return NextResponse.json({ error: "Collection not found" }, { status: 404 })
       }

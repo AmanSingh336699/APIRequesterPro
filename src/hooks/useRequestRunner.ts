@@ -14,7 +14,7 @@ export function useRequestRunner() {
       let requestBody;
       try {
         requestBody = parsedRequest.body ? JSON.parse(parsedRequest.body) : undefined;
-      } catch (error) {
+      } catch{
         throw new Error("Invalid JSON body. Please check the syntax and try again.");
       }
       const res = await makeRequest({

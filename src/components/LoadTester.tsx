@@ -17,7 +17,6 @@ import {
 } from "chart.js";
 import Input from "./ui/Input";
 import { makeRequest } from "@/lib/axios";
-import { validateUrl } from "@/utils/helper";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 

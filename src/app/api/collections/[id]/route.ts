@@ -26,15 +26,18 @@ async function handler(req: NextRequest, context: RouteContext) {
                 _id: collectionId,
                 userId: session.user.id
             })
-            if(!collection){
+            if (!collection) {
                 return NextResponse.json({ error: "Collection not found" }, { status: 404 })
             }
-            return NextResponse.json({message: "Collection deleted successfully"});
-        } catch (error: any) {
-            return NextResponse.json({ error: "Failed to delete collection" }, { status: 500 });
+            return NextResponse.json({ message: "Collection deleted successfully" });
+        } catch (error) {
+            let message = "Failed to delete collection";
+            if (error instanceof Error) {
+                message = error.message;
+            }
+            return NextResponse.json({ error: message }, { status: 500 });
         }
     }
-
     return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }
 
