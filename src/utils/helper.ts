@@ -11,7 +11,7 @@ export const validateJSON = (value: string) => {
       if (!value) return [];
       JSON.parse(value);
       return [];
-    } catch (err) {
+    } catch {
       return [{ row: 0, column: 0, text: 'Invalid JSON format', type: 'error' }];
     }
   };

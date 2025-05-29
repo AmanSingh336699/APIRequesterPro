@@ -79,27 +79,3 @@ export function parseRequest(
   return { ...request, url, headers, body };
 }
 
-export function executeScript(script: string, env: { [key: string]: any }, response?: any) {
-  try {
-    const fn = new Function("env", "response", script);
-    fn(env, response);
-  } catch (error) {
-    console.error("Script execution error:", error);
-  }
-}
-
-export function isValidJson(body: string): boolean {
-  try {
-    JSON.parse(body);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export function formatHeaders(headers: { key: string; value: string }[]): string {
-  return headers
-    .filter((h) => h.key && h.value)
-    .map((h) => `${h.key}: ${h.value}`)
-    .join("\n");
-}
