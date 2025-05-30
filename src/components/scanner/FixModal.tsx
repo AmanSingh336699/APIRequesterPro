@@ -74,7 +74,7 @@ const FixModal: React.FC<FixModalProps> = ({ isOpen, onClose, fix, language = 'j
 
   return ReactDOM.createPortal(
     <AnimatePresence>{isOpen && modalContent}</AnimatePresence>,
-    document.body
+    document.getElementById("modal-root")!
   );
 };
 

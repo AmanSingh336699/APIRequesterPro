@@ -41,3 +41,20 @@ export interface EnvironmentFormData {
   name: string;
   variables: Variable[];
 }
+
+export interface HistoryEntry {
+    _id: string;
+    method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    url: string;
+    headers?: Record<string, string>;
+    body?: string;
+    status: number;
+    response: any;
+    duration: number;
+    createdAt: string;
+}
+
+export interface HistoryResponse {
+    data: HistoryEntry[];
+    pagination: { total: number };
+}

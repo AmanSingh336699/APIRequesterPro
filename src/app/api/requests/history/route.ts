@@ -8,6 +8,7 @@ import { dbMiddleware } from "@/lib/dbMiddleware";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import mongoose from "mongoose";
+import { MAX_HISTORY_ITEMS } from "@/lib/constants";
 
 
 const requestHistorySchema = z.object({
@@ -58,7 +59,7 @@ async function handler(req: NextRequest) {
           totalPages: Math.ceil(totalCount / limit),
         },
       });
-    } catch{
+    } catch {
       return NextResponse.json({ error: "Failed to fetch request history" }, { status: 500 });
     }
   }
@@ -69,6 +70,11 @@ async function handler(req: NextRequest) {
       const body = await req.json();
       const sanitizedBody = sanitizeObject(body);
       const data = requestHistorySchema.parse(sanitizedBody);
+      const count = await History.countDocuments({ userId: session.user.id });
+
+      if (count >= MAX_HISTORY_ITEMS) {
+        return NextResponse.json({ message: "Max history limit reached, new item not stored" }, { status: 200 });
+      }
       const requestHistory = new History({
         userId: session.user.id,
         ...data,
@@ -85,16 +91,28 @@ async function handler(req: NextRequest) {
   }
   if (req.method === "DELETE") {
     try {
-      const { id } = await req.json()
-      const historyItem = await History.findOneAndDelete({ _id: id, userId: session.user.id })
-      if (!historyItem) {
-        return NextResponse.json({ error: "History item not found" }, { status: 404 })
+      const url = new URL(req.url);
+      const deleteAll = url.searchParams.get("all") === "true";
+
+      if (deleteAll) {
+        const result = await History.deleteMany({ userId: session.user.id });
+        return NextResponse.json({ message: `Deleted ${result.deletedCount} history items` });
+      } else {
+        const { id } = await req.json();
+        if (!id) {
+          return NextResponse.json({ error: "Missing id for deletion" }, { status: 400 });
+        }
+        const deleted = await History.findOneAndDelete({ _id: id, userId: session.user.id });
+        if (!deleted) {
+          return NextResponse.json({ error: "History item not found" }, { status: 404 });
+        }
+        return NextResponse.json({ message: "History item deleted successfully" });
       }
-      return NextResponse.json({ message: "History item deleted successfully" })
-    } catch{
-      return NextResponse.json({ error: "Failed to delete history item" }, { status: 500 })
+    } catch (error) {
+      return NextResponse.json({ error: "Failed to delete history" }, { status: 500 });
     }
   }
+
 
   return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
 }

@@ -3,9 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState, Suspense } from "react";
 import RequestForm from "./forms/RequestForm";
 import CollectionRunner from "./CollectionRunner";
-import HistoryViewer from "./History";
 import CollectionsManager from "./CollectionManager";
 import EnvironmentManager from "./EnvironmentManager";
+import HistoryViewer from "./History/HistoryViewer";
 
 function RequestRunner() {
   const [selectedTab, setSelectedTab] = useState(0);

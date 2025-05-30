@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { produce } from "immer";
+import { DEFAULT_ENVIRONMENT } from "@/lib/constants";
 
 export interface Environment {
   _id: string
@@ -25,11 +26,7 @@ export const useEnvStore = create<EnvState>((set) => ({
           state.selectedEnvironment = environments[0].name;
         } else if (environments.length === 0){
           state.environments = [
-            {
-              _id: "default",
-              name: "Default",
-              variables: []
-            }
+            DEFAULT_ENVIRONMENT,
           ];
           state.selectedEnvironment = "Default"
         }

@@ -10,6 +10,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body>
         <ClientProvider>{children}</ClientProvider>
+        <div id="modal-root"></div>
       </body>
     </html>
   );
