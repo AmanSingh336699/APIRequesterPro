@@ -58,8 +58,7 @@ async function postHandler(req: NextRequest, context: HandlerContext) {
   }
 }
 
-
-export function composeMiddlewares<T>(
+function composeMiddlewares<T>(
   handler: (req: NextRequest, context: T) => Promise<NextResponse>,
   ...middlewares: Array<
     (
@@ -72,7 +71,6 @@ export function composeMiddlewares<T>(
     handler
   );
 }
-
 
 const composedGetHandler = composeMiddlewares(
   getHandler,
@@ -88,10 +86,5 @@ const composedPostHandler = composeMiddlewares(
   securityMiddleware
 );
 
-export async function GET(req: NextRequest, context: HandlerContext) {
-  return composedGetHandler(req, context);
-}
-
-export async function POST(req: NextRequest, context: HandlerContext) {
-  return composedPostHandler(req, context);
-}
+export const GET = composedGetHandler;
+export const POST = composedPostHandler;
