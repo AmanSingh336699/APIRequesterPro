@@ -73,6 +73,7 @@ function composeMiddlewares<T extends { params: Record<string, string | string[]
   );
 }
 
+// Composed handlers
 const composedGetHandler = composeMiddlewares(
   getHandler,
   dbMiddleware,
@@ -87,5 +88,6 @@ const composedPostHandler = composeMiddlewares(
   securityMiddleware
 );
 
-export const GET = composedGetHandler;
-export const POST = composedPostHandler;
+// Route Handler exports with type assertions
+export const GET = composedGetHandler as (req: NextRequest, context: { params: { id: string } }) => Promise<NextResponse>;
+export const POST = composedPostHandler as (req: NextRequest, context: { params: { id: string } }) => Promise<NextResponse>;
