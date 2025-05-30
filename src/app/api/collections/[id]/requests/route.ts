@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Request from "@/models/Request";
-import { dbMiddleware } from "@/lib/dbMiddleware";
-import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware";
-import { securityMiddleware } from "@/lib/securityMiddleware";
-import { composeMiddlewares } from "@/lib/composeMiddlewares";
+import { dbMiddleware } from "@/lib/dbMiddleware";           
+import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware"; 
+import { securityMiddleware } from "@/lib/securityMiddleware";   
 
 async function getHandler(req: NextRequest, context: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
@@ -55,20 +54,22 @@ async function postHandler(req: NextRequest, context: { params: { id: string } }
   }
 }
 
+const composedGetHandler = dbMiddleware(
+  rateLimitMiddleware(
+    securityMiddleware(getHandler)
+  )
+);
+
+const composedPostHandler = dbMiddleware(
+  rateLimitMiddleware(
+    securityMiddleware(postHandler)
+  )
+);
+
 export async function GET(req: NextRequest, context: { params: { id: string } }) {
-  return composeMiddlewares(
-    getHandler,
-    dbMiddleware,
-    rateLimitMiddleware,
-    securityMiddleware
-  )(req, context);
+  return composedGetHandler(req, context);
 }
 
 export async function POST(req: NextRequest, context: { params: { id: string } }) {
-  return composeMiddlewares(
-    postHandler,
-    dbMiddleware,
-    rateLimitMiddleware,
-    securityMiddleware
-  )(req, context);
+  return composedPostHandler(req, context);
 }
