@@ -6,18 +6,20 @@ import { dbMiddleware } from "@/lib/dbMiddleware";
 import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware";
 import { securityMiddleware } from "@/lib/securityMiddleware";
 
+// Define the Params interface for the dynamic route
 interface Params {
   params: { id: string };
 }
 
-async function getHandler(req: NextRequest, { params }: Params) {
+// Base GET handler
+async function getHandler(req: NextRequest, context: Params) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const collectionId = params.id;
+    const collectionId = context.params.id;
 
     const requests = await Request.find({
       collectionId,
@@ -34,7 +36,8 @@ async function getHandler(req: NextRequest, { params }: Params) {
   }
 }
 
-async function postHandler(req: NextRequest, { params }: Params) {
+// Base POST handler (optional, included for completeness)
+async function postHandler(req: NextRequest, context: Params) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -42,7 +45,7 @@ async function postHandler(req: NextRequest, { params }: Params) {
 
   try {
     const body = await req.json();
-    const collectionId = params.id;
+    const collectionId = context.params.id;
 
     const newRequest = await Request.create({
       ...body,
@@ -58,7 +61,7 @@ async function postHandler(req: NextRequest, { params }: Params) {
   }
 }
 
-// Non-exported middleware composition function
+// Middleware composition function
 function composeMiddlewares<T extends { params: Record<string, string | string[]> }>(
   handler: (req: NextRequest, context: T) => Promise<NextResponse>,
   ...middlewares: Array<
@@ -73,21 +76,21 @@ function composeMiddlewares<T extends { params: Record<string, string | string[]
   );
 }
 
-// Composed handlers
-const composedGetHandler = composeMiddlewares(
+// Compose the handlers with explicit Params type
+const composedGetHandler = composeMiddlewares<Params>(
   getHandler,
   dbMiddleware,
   rateLimitMiddleware,
   securityMiddleware
 );
 
-const composedPostHandler = composeMiddlewares(
+const composedPostHandler = composeMiddlewares<Params>(
   postHandler,
   dbMiddleware,
   rateLimitMiddleware,
   securityMiddleware
 );
 
-// Route Handler exports with type assertions
-export const GET = composedGetHandler as (req: NextRequest, context: { params: { id: string } }) => Promise<NextResponse>;
-export const POST = composedPostHandler as (req: NextRequest, context: { params: { id: string } }) => Promise<NextResponse>;
+// Export the route handlers
+export const GET = composedGetHandler;
+export const POST = composedPostHandler;
