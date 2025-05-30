@@ -6,7 +6,7 @@ import { dbMiddleware } from "@/lib/dbMiddleware";
 import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware"; 
 import { securityMiddleware } from "@/lib/securityMiddleware";   
 
-async function getHandler(req: NextRequest, context: { params: { id: string } }) {
+async function getHandler(req: NextRequest, context: any) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -30,7 +30,7 @@ async function getHandler(req: NextRequest, context: { params: { id: string } })
   }
 }
 
-async function postHandler(req: NextRequest, context: { params: { id: string } }) {
+async function postHandler(req: NextRequest, context: any) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -66,10 +66,10 @@ const composedPostHandler = dbMiddleware(
   )
 );
 
-export async function GET(req: NextRequest, context: { params: { id: string } }) {
+export async function GET(req: NextRequest, context: any) {
   return composedGetHandler(req, context);
 }
 
-export async function POST(req: NextRequest, context: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: any) {
   return composedPostHandler(req, context);
 }
