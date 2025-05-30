@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "@hookform/resolvers": "^5.0.1",
+    "@netlify/next": "^1.4.9",
     "@tanstack/react-query": "^5.76.1",
     "ace-builds": "^1.41.0",
     "axios": "^1.9.0",

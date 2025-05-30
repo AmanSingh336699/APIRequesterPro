@@ -6,12 +6,10 @@ import { dbMiddleware } from "@/lib/dbMiddleware";
 import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware";
 import { securityMiddleware } from "@/lib/securityMiddleware";
 
-// Define the Params interface for the dynamic route
 interface Params {
   params: { id: string };
 }
 
-// Base GET handler
 async function getHandler(req: NextRequest, context: Params) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -36,7 +34,6 @@ async function getHandler(req: NextRequest, context: Params) {
   }
 }
 
-// Base POST handler (optional, included for completeness)
 async function postHandler(req: NextRequest, context: Params) {
   const session = await getServerSession(authOptions);
   if (!session) {
@@ -61,7 +58,6 @@ async function postHandler(req: NextRequest, context: Params) {
   }
 }
 
-// Middleware composition function
 function composeMiddlewares<T extends { params: Record<string, string | string[]> }>(
   handler: (req: NextRequest, context: T) => Promise<NextResponse>,
   ...middlewares: Array<
@@ -76,7 +72,6 @@ function composeMiddlewares<T extends { params: Record<string, string | string[]
   );
 }
 
-// Compose the handlers with explicit Params type
 const composedGetHandler = composeMiddlewares<Params>(
   getHandler,
   dbMiddleware,
@@ -91,6 +86,5 @@ const composedPostHandler = composeMiddlewares<Params>(
   securityMiddleware
 );
 
-// Export the route handlers
 export const GET = composedGetHandler;
 export const POST = composedPostHandler;
