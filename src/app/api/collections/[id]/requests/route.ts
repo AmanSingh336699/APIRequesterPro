@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import Request from "@/models/Request";
-import { dbMiddleware } from "@/lib/dbMiddleware";           
-import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware"; 
-import { securityMiddleware } from "@/lib/securityMiddleware";   
+import { dbMiddleware } from "@/lib/dbMiddleware";
+import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware";
+import { securityMiddleware } from "@/lib/securityMiddleware";
 
-async function getHandler(req: NextRequest, context: any) {
+type HandlerContext = {
+  params: { id: string };
+};
+
+async function getHandler(req: NextRequest, context: HandlerContext) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -30,7 +34,7 @@ async function getHandler(req: NextRequest, context: any) {
   }
 }
 
-async function postHandler(req: NextRequest, context: any) {
+async function postHandler(req: NextRequest, context: HandlerContext) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -54,22 +58,40 @@ async function postHandler(req: NextRequest, context: any) {
   }
 }
 
-const composedGetHandler = dbMiddleware(
-  rateLimitMiddleware(
-    securityMiddleware(getHandler)
-  )
+
+export function composeMiddlewares<T>(
+  handler: (req: NextRequest, context: T) => Promise<NextResponse>,
+  ...middlewares: Array<
+    (
+      handler: (req: NextRequest, context: T) => Promise<NextResponse>
+    ) => (req: NextRequest, context: T) => Promise<NextResponse>
+  >
+): (req: NextRequest, context: T) => Promise<NextResponse> {
+  return middlewares.reduce(
+    (acc, middleware) => middleware(acc),
+    handler
+  );
+}
+
+
+const composedGetHandler = composeMiddlewares(
+  getHandler,
+  dbMiddleware,
+  rateLimitMiddleware,
+  securityMiddleware
 );
 
-const composedPostHandler = dbMiddleware(
-  rateLimitMiddleware(
-    securityMiddleware(postHandler)
-  )
+const composedPostHandler = composeMiddlewares(
+  postHandler,
+  dbMiddleware,
+  rateLimitMiddleware,
+  securityMiddleware
 );
 
-export async function GET(req: NextRequest, context: any) {
+export async function GET(req: NextRequest, context: HandlerContext) {
   return composedGetHandler(req, context);
 }
 
-export async function POST(req: NextRequest, context: any) {
+export async function POST(req: NextRequest, context: HandlerContext) {
   return composedPostHandler(req, context);
 }
