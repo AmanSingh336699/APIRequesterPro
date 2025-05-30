@@ -6,18 +6,18 @@ import { dbMiddleware } from "@/lib/dbMiddleware";
 import { rateLimitMiddleware } from "@/lib/rateLimitMiddleware";
 import { securityMiddleware } from "@/lib/securityMiddleware";
 
-type HandlerContext = {
+interface Params {
   params: { id: string };
-};
+}
 
-async function getHandler(req: NextRequest, context: HandlerContext) {
+async function getHandler(req: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const collectionId = context.params.id;
+    const collectionId = params.id;
 
     const requests = await Request.find({
       collectionId,
@@ -34,7 +34,7 @@ async function getHandler(req: NextRequest, context: HandlerContext) {
   }
 }
 
-async function postHandler(req: NextRequest, context: HandlerContext) {
+async function postHandler(req: NextRequest, { params }: Params) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -42,7 +42,7 @@ async function postHandler(req: NextRequest, context: HandlerContext) {
 
   try {
     const body = await req.json();
-    const collectionId = context.params.id;
+    const collectionId = params.id;
 
     const newRequest = await Request.create({
       ...body,
@@ -58,7 +58,8 @@ async function postHandler(req: NextRequest, context: HandlerContext) {
   }
 }
 
-function composeMiddlewares<T>(
+// Non-exported middleware composition function
+function composeMiddlewares<T extends { params: Record<string, string | string[]> }>(
   handler: (req: NextRequest, context: T) => Promise<NextResponse>,
   ...middlewares: Array<
     (
