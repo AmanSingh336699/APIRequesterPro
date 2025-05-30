@@ -108,7 +108,7 @@ async function handler(req: NextRequest) {
         }
         return NextResponse.json({ message: "History item deleted successfully" });
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: "Failed to delete history" }, { status: 500 });
     }
   }
